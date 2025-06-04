@@ -1,0 +1,4 @@
+github.com/MirzaDgtu/fc_CryptoTrader v0.0.0-20250603065955-583755637216 h1:fyAHCvobLelTV8uG7xqJdxPGk7LIT+A5TiDwdxYp38E=
+github.com/MirzaDgtu/fc_CryptoTrader v0.0.0-20250603065955-583755637216/go.mod h1:BCfr1qN1jEug05q8HiEwsmQHpuEDYt4NVk9ytyjtYn8=
+github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
+github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=

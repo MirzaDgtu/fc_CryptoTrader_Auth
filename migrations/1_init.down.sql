@@ -1,0 +1,2 @@
+DROP TABLE apps;
+DROP TABLE users;
