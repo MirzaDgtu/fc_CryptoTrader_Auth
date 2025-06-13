@@ -1,15 +1,12 @@
-module fc_CryptoTrader_Auth
+module fc_cryptotrader_auth
 
-go 1.23.0
+go 1.23.1
 
-toolchain go1.23.10
+require github.com/ilyakaznacheev/cleanenv v1.5.0
 
 require (
-	github.com/BurntSushi/toml v1.5.0 // indirect
-	github.com/MirzaDgtu/fc_CryptoTrader v0.0.0-20250603065955-583755637216 // indirect
-	github.com/ilyakaznacheev/cleanenv v1.5.0 // indirect
+	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
