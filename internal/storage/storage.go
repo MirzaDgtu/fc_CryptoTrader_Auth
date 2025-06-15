@@ -30,3 +30,14 @@ func containsAtSymbol(email string) bool {
 	}
 	return false
 }
+
+func IsValidPassword(password string) bool {
+	// Simple password validation logic
+	if len(password) < 8 {
+		return false
+	}
+	if len(password) > 64 {
+		return false
+	}
+	return true
+}

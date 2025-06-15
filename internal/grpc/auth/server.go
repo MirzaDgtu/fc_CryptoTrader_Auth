@@ -188,15 +188,85 @@ func (s *serverAPI) ValidateToken(ctx context.Context, req *authpb.ValidateToken
 }
 
 func (s *serverAPI) ChangePassword(ctx context.Context, req *authpb.ChangePasswordRequest) (*authpb.ChangePasswordResponse, error) {
-	return s.auth.ChangePassword(ctx, req.UserId, req.CurrentPassword, req.NewPassword)
+	if req.UserId == "" || req.CurrentPassword == "" || req.NewPassword == "" {
+		return nil, status.Error(codes.InvalidArgument, "user ID, current password and new password must be provided")
+	}
+	if len(req.UserId) < 1 || len(req.UserId) > 64 {
+		return nil, status.Error(codes.InvalidArgument, "user ID must be between 1 and 64 characters long")
+	}
+	if len(req.CurrentPassword) < 8 || len(req.NewPassword) < 8 {
+		return nil, status.Error(codes.InvalidArgument, "password must be at least 8 characters long")
+	}
+	if len(req.NewPassword) > 64 {
+		return nil, status.Error(codes.InvalidArgument, "new password must be at most 64 characters long")
+	}
+	if req.CurrentPassword == req.NewPassword {
+		return nil, status.Error(codes.InvalidArgument, "current password and new password must be different")
+	}
+
+	if !storage.IsValidPassword(req.NewPassword) {
+		return nil, status.Error(codes.InvalidArgument, "new password must contain at least one uppercase letter, one lowercase letter, one digit and one special character")
+	}
+
+	res, err := s.auth.ChangePassword(ctx, req.UserId, req.CurrentPassword, req.NewPassword)
+	if err != nil {
+		if errors.Is(err, storage.ErrUserNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+		if errors.Is(err, storage.ErrInvalidCredentials) {
+			return nil, status.Error(codes.Unauthenticated, "invalid current password")
+		}
+		return nil, status.Error(codes.Internal, "failed to change password")
+	}
+
+	return &authpb.ChangePasswordResponse{
+		Success: res.Success,
+	}, nil
 }
 
 func (s *serverAPI) ResetPassword(ctx context.Context, req *authpb.ResetPasswordRequest) (*authpb.ResetPasswordResponse, error) {
-	return s.auth.ResetPassword(ctx, req.Email)
+	if req.Email == "" {
+		return nil, status.Error(codes.InvalidArgument, "email must be provided")
+	}
+	if !storage.IsValidEmail(req.Email) {
+		return nil, status.Error(codes.InvalidArgument, "invalid email format")
+	}
+
+	res, err := s.auth.ResetPassword(ctx, req.Email)
+	if err != nil {
+		if errors.Is(err, storage.ErrUserNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+	}
+
+	return &authpb.ResetPasswordResponse{
+		Success: res.Success,
+	}, nil
 }
 
 func (s *serverAPI) ConfirmResetPassword(ctx context.Context, req *authpb.ConfirmResetPasswordRequest) (*authpb.ConfirmResetPasswordResponse, error) {
-	return s.auth.ConfirmResetPassword(ctx, req.Token, req.NewPassword)
+
+	if req.Token == "" || req.NewPassword == "" {
+		return nil, status.Error(codes.InvalidArgument, "token and new password must be provided")
+	}
+	if len(req.Token) < 1 || len(req.Token) > 256 {
+		return nil, status.Error(codes.InvalidArgument, "token must be between 1 and 256 characters long")
+	}
+
+	res, err := s.auth.ConfirmResetPassword(ctx, req.Token, req.NewPassword)
+	if err != nil {
+		if errors.Is(err, storage.ErrInvalidCredentials) {
+			return nil, status.Error(codes.Unauthenticated, "invalid token or new password")
+		}
+		if errors.Is(err, storage.ErrUserNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+		return nil, status.Error(codes.Internal, "failed to confirm reset password")
+	}
+
+	return &authpb.ChangePasswordResponse{
+		Success: res.Success,
+	}, err
 }
 
 func (s *serverAPI) HealthCheck(ctx context.Context, req *commonpb.HealthCheckRequest) (*commonpb.HealthCheckResponse, error) {
