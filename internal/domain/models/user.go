@@ -15,4 +15,5 @@ type User struct {
 	Role         string     `json:"role"` // e.g., "admin", "user", etc.
 	CreatedAt    *time.Time `json:"created_at"`
 	UpdatedAt    *time.Time `json:"updated_at"`
+	IsAdmin      bool       `json:"is_admin"` // true if the user is an admin
 }

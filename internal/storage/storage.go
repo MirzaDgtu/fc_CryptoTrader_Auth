@@ -9,6 +9,10 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrInvalidEmailFormat = errors.New("invalid email format")
 	ErrInternalServer     = errors.New("internal server error")
+	ErrInvalidPassword    = errors.New("invalid password format")
+	ErrInvalidToken       = errors.New("invalid token")
+	ErrUserInactive       = errors.New("user is inactive")
+	ErrUserAlreadyActive  = errors.New("user is already active")
 )
 
 func IsValidEmail(email string) bool {
